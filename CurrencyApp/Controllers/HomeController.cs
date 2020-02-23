@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using CurrencyApp.Models;
+using System.Net;
+using System.IO;
 
 namespace CurrencyApp.Controllers
 {
@@ -20,6 +22,17 @@ namespace CurrencyApp.Controllers
 
         public IActionResult Index()
         {
+            WebRequest request = WebRequest.Create("https://finance.yahoo.com/rss/topstories");
+            WebResponse response = request.GetResponse();
+            using (Stream stream = response.GetResponseStream())
+            {
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    string a = (reader.ReadToEnd());
+                    Console.WriteLine();
+                }
+            }
+            response.Close();
             return View();
         }
 
