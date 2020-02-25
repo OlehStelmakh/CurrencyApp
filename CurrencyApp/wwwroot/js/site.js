@@ -13,7 +13,7 @@ var chart = new Chart(ctx, {
         datasets: [{
             label: "Dollar exchange rate",
             borderColor: 'rgb(255, 99, 132)',
-            data: [25, 24.4, 24.6, 24, 25, 24,24.5],
+            data: [26.4, 26.7, 23.4, 27.4, 31.2, 24.5, 20.2],
         }]
     },
 
