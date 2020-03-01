@@ -7,6 +7,6 @@ namespace CurrencyApp.Models
         public static DateTime startAt { set; get; }
         public static DateTime endAt { set; get; }
         public static string baseCurrency {set; get;}
-        public static Dictionary<string, double> symbols { set; get; }
+        public static List<string> symbols { set; get; }
     }
 }

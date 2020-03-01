@@ -6,9 +6,8 @@ using System.Net;
 using System.IO;
 using System;
 using Newtonsoft.Json.Linq;
-using Json.Net;
-using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Web;
 
 namespace CurrencyApp.Controllers
 {
@@ -23,15 +22,11 @@ namespace CurrencyApp.Controllers
 
         public IActionResult Index()
         {
-            string request = "https://api.exchangeratesapi.io/history?start_at=2020-02-20&end_at=2020-02-25&base=USD&symbols=RUB,EUR";
+            string request = "https://api.exchangeratesapi.io/history?start_at=2019-09-01&end_at=2020-02-25&base=EUR&symbols=RUB,USD,ILS,JPY";
             createResponse(request);
             createDataLists(Rates.Data);
-
-            ViewBag.FirstCurrencyValues = Rates.currencies["EUR"].ToArray();
-            ViewBag.SecondCurrencyValues = Rates.currencies["RUB"].ToArray();
-            ViewBag.Dates = Rates.availableDates.ToArray();
-
-            return View();
+            Rates rates = new Rates();
+            return View(rates);
         }
 
         public IActionResult Privacy()
@@ -61,14 +56,14 @@ namespace CurrencyApp.Controllers
 
         public static void analyzeResponseData(string jsonData)
         {
-            Rates.Data = new Dictionary<DateTime, Dictionary<string, double>>();
+            Rates.Data = new SortedDictionary<DateTime, Dictionary<string, double>>();
             
             var jsonObject = JObject.Parse(jsonData);
 
             CurrencyData.startAt = getDateFromString(jsonObject["start_at"].ToString());
             CurrencyData.endAt = getDateFromString(jsonObject["end_at"].ToString());
             CurrencyData.baseCurrency = jsonObject["base"].ToString();
-
+            List<string> currencies = new List<string>();
             var days = jsonObject["rates"];
             foreach (JProperty day in days) {
 
@@ -76,10 +71,15 @@ namespace CurrencyApp.Controllers
                 Dictionary<string, double> keyValues = new Dictionary<string, double>();
                 foreach (JProperty currency in day.Value)
                 {
+                    if (!currencies.Contains(currency.Name))
+                    {
+                        currencies.Add(currency.Name);
+                    }
                     keyValues.Add(currency.Name, double.Parse(currency.Value.ToString()));
                 }
                 Rates.Data.Add(dateTime, keyValues);
             }
+            CurrencyData.symbols = currencies;
         }
 
         public static DateTime getDateFromString(string date)
@@ -90,14 +90,13 @@ namespace CurrencyApp.Controllers
             return new DateTime(year, month, day);
         }
 
-        public static void createDataLists(Dictionary<DateTime, Dictionary<string, double>> data)
+        public static void createDataLists(SortedDictionary<DateTime, Dictionary<string, double>> data)
         {
             List<DateTime> dates = new List<DateTime>();
             foreach (var key in data)
             {
                 dates.Add(key.Key);
             }
-            dates.Reverse();
             Rates.availableDates = new List<DateTime>(dates);
 
             Dictionary<string, List<double>> currencies = new Dictionary<string, List<double>>();
@@ -116,7 +115,7 @@ namespace CurrencyApp.Controllers
                     }
                 }
             }
-            Rates.currencies = new Dictionary<string, List<double>>(currencies);
+            Rates.currencies = new SortedDictionary<string, List<double>>(currencies);
         }
         
         /*

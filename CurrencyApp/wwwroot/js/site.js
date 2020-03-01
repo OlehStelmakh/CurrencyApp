@@ -2,7 +2,7 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
-var ctx = document.getElementById('myChart').getContext('2d');
+/*var ctx = document.getElementById('myChart').getContext('2d');
 
 var chart = new Chart(ctx, {
 
@@ -18,16 +18,19 @@ var chart = new Chart(ctx, {
     },
 
     options: {
-        /*scales: {
+        scales: {
             yAxes: [{
                 ticks: {
                     beginAtZero: true
                 }
             }]
-        }*/
+        }
     }
 });
 
+
+var test1 = ["January", "February", "March", "April", "May", "June", "July"];
+var test2 = [27, 26.4, 26, 25.7, 26.3, 26.8, 26];
 
 var ctx = document.getElementById('myChart1').getContext('2d');
 
@@ -40,13 +43,13 @@ var chart = new Chart(ctx, {
         datasets: [{
             label: "Euro exchange rate",
             borderColor: 'rgb(99, 255, 132)',
-            data: [27, 26.4, 26, 25.7, 26.3, 26.8, 26],
+            data: Rates.currencies["EUR"],
         }]
     },
 
     options: {
         
     }
-});
+});*/
 
 
