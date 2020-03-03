@@ -8,6 +8,7 @@ using System;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Web;
+using System.Text;
 
 namespace CurrencyApp.Controllers
 {
@@ -22,7 +23,8 @@ namespace CurrencyApp.Controllers
 
         public IActionResult Index()
         {
-            string request = "https://api.exchangeratesapi.io/history?start_at=2019-09-01&end_at=2020-02-25&base=EUR&symbols=RUB,USD,ILS,JPY";
+            string request = CreateRequest();
+            //string request = "https://api.exchangeratesapi.io/latest";
             createResponse(request);
             createDataLists(Rates.Data);
             Rates rates = new Rates();
@@ -38,6 +40,36 @@ namespace CurrencyApp.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public static string CreateRequest()
+        {
+            StringBuilder stringBuilder = new StringBuilder(150);
+            stringBuilder.Append(RequestData.baseUrl);
+            if (!string.IsNullOrEmpty(RequestData.onlyOneDay))
+            {
+                stringBuilder.Append(RequestData.onlyOneDay);
+                return stringBuilder.ToString();
+            }
+            stringBuilder.Append(RequestData.historyOrLatest);
+            stringBuilder.Append(RequestData.startAt);
+            stringBuilder.Append(RequestData.endAt);
+
+            for (int i = 0; i<RequestData.symbols.Length; i++)
+            {
+                if (i==0)
+                {
+                    stringBuilder.Append("symbols=");
+                }
+                if (i==RequestData.symbols.Length - 1)
+                {
+                    stringBuilder.Append(RequestData.symbols[i] + "&");
+                    break;
+                }
+                stringBuilder.Append(RequestData.symbols[i] + ",");
+            }
+            stringBuilder.Append(RequestData.baseCurrency);
+            return stringBuilder.ToString();
         }
 
         public static void createResponse(string requestMessage)
@@ -60,10 +92,37 @@ namespace CurrencyApp.Controllers
             
             var jsonObject = JObject.Parse(jsonData);
 
-            CurrencyData.startAt = getDateFromString(jsonObject["start_at"].ToString());
-            CurrencyData.endAt = getDateFromString(jsonObject["end_at"].ToString());
-            CurrencyData.baseCurrency = jsonObject["base"].ToString();
+            if (!string.IsNullOrEmpty(RequestData.startAt))
+            {
+                CurrencyData.startAt = getDateFromString(jsonObject["start_at"].ToString());
+            }
+            if (!string.IsNullOrEmpty(RequestData.endAt))
+            {
+                CurrencyData.endAt = getDateFromString(jsonObject["end_at"].ToString());
+            }
+            if (!string.IsNullOrEmpty(RequestData.baseCurrency))
+            {
+                CurrencyData.baseCurrency = jsonObject["base"].ToString();
+            }
+            
             List<string> currencies = new List<string>();
+            if (RequestData.historyOrLatest.Contains("latest"))
+            {
+                var lastUpdates = jsonObject["rates"];
+                Dictionary<string, double> keyValues = new Dictionary<string, double>();
+
+                foreach (JProperty currency in lastUpdates)
+                {
+                    if (!currencies.Contains(currency.Name))
+                    {
+                        currencies.Add(currency.Name);
+                    }
+                    keyValues.Add(currency.Name, double.Parse(currency.Value.ToString()));
+                }
+                Rates.Data.Add(DateTime.Now, keyValues);
+                CurrencyData.symbols = currencies;
+                return;
+            }
             var days = jsonObject["rates"];
             foreach (JProperty day in days) {
 
