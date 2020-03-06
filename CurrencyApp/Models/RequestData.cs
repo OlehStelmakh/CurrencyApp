@@ -10,9 +10,9 @@ namespace CurrencyApp.Models
 
         public static string startAt { get; set; } = "start_at=2020-01-01&";
 
-        public static string endAt { get; set; } = "end_at=2020-03-01&";
+        public static string endAt { get; set; } = "end_at=" + DateTime.Now.ToString("yyyy-MM-dd") + "&";
 
-        public static string[] symbols { get; set; } = { "CAD", "HKD", "PHP", "DKK", "EUR", "RUB" };
+        public static string[] symbols { get; set; } = { "CAD", "HKD", "PHP", "DKK", "EUR", "RUB", "USD" };
 
         public static string baseCurrency { get; set; } = "base=USD&";
 

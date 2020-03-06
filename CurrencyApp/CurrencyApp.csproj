@@ -11,6 +11,7 @@
   <ItemGroup>
     <Folder Include="Views\News\" />
     <Folder Include="Views\Data\" />
+    <Folder Include="Shared\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

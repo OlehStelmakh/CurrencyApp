@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Web;
 using System.Text;
+using CurrencyApp.Shared;
 
 namespace CurrencyApp.Controllers
 {
@@ -24,8 +25,8 @@ namespace CurrencyApp.Controllers
         public IActionResult Index()
         {
             string request = CreateRequest();
-            //string request = "https://api.exchangeratesapi.io/latest";
-            createResponse(request);
+            string response = AdditionalMethods.createResponse(request);
+            analyzeResponseData(response);
             createDataLists(Rates.Data);
             Rates rates = new Rates();
             return View(rates);
@@ -70,20 +71,6 @@ namespace CurrencyApp.Controllers
             }
             stringBuilder.Append(RequestData.baseCurrency);
             return stringBuilder.ToString();
-        }
-
-        public static void createResponse(string requestMessage)
-        {
-            WebRequest request = WebRequest.Create(requestMessage);
-            WebResponse response = request.GetResponse();
-            using (Stream stream = response.GetResponseStream())
-            {
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    analyzeResponseData(reader.ReadToEnd());
-                }
-            }
-            response.Close();
         }
 
         public static void analyzeResponseData(string jsonData)
