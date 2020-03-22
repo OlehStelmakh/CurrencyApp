@@ -2,47 +2,72 @@
 
 <div class="container-fluid">
     <div class="row text-center">
-        @for (int i = 0; i < CurrencyData.symbols.Count; i++)
-        {
-            <div class="col-xs-12 col-sm-12 col-lg-12">
-                <canvas id="myChart @i")></canvas>
-            </div>
-        }
     </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.js"></script>
 
-@for (int i=0; i<CurrencyData.symbols.Count; i++)
-{
-    Random random = new Random();
-    int red = random.Next(255);
-    int green = random.Next(255);
-    int blue = random.Next(255);
-    
-    <script type="text/javascript">
+<div class="container-fluid">
+    <div class="row text-center">
 
-    var color = "rgb(@red,@green,@blue)";
-    var ctx = document.getElementById("myChart "+"@i").getContext('2d');
-
-    var eur = @Html.Raw(Json.Serialize(Rates.currencies[CurrencyData.symbols[i]]));
-    var dates = @Html.Raw(Json.Serialize(Rates.availableDates.Select(x => x.ToString("MMMM dd"))));
-
-    var chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: dates,
-            datasets: [{
-                label: "@CurrencyData.symbols[i] exchange rate",
-                borderColor: color,
-                data: eur,
-            }]
-        },
-
-        options: {
+        @if (ViewBag.swapped == true)
+        {
+            <div class="alert alert-success container-fluid" id="notification" role="alert">
+                <h5 class="alert-heading">You made a mistake!</h5>
+                <p>We have inverted your dates for proper display. Be careful.</p>
+            </div>
+            <script type="text/javascript">
+                setTimeout(function () { $('#notification').fadeOut('slow') }, 5000);
+            </script>
         }
-    });
 
-    </script>
-}
+        @if (CurrencyData.symbols != null &&
+           RequestData.startAt != RequestData.endAt)
+        {
+            for (int i = 0; i < CurrencyData.symbols.Count; i++)
+            {
+                Random random = new Random();
+                int red = random.Next(255);
+                int green = random.Next(255);
+                int blue = random.Next(255);
+
+                <div class="col-xs-12 col-sm-12 col-lg-12">
+                    <canvas id="myChart @i" )></canvas>
+                </div>
+
+                <script type="text/javascript">
+
+                    var color = "rgb(@red,@green,@blue)";
+                    var ctx = document.getElementById("myChart "+"@i").getContext('2d');
+
+                    var eur = @Html.Raw(Json.Serialize(Rates.currencies[CurrencyData.symbols[i]]));
+                    var dates = @Html.Raw(Json.Serialize(Rates.availableDates.Select(x => x.ToString("MMMM dd"))));
+
+                    var chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [{
+                                label: "@CurrencyData.symbols[i] exchange rate",
+                                borderColor: color,
+                                data: eur,
+                            }]
+                        },
+
+                        options: {
+                        }
+                    });
+                </script>
+            }
+        }
+        else if (CurrencyData.symbols == null)
+        {
+            <div>Please choose information you need on data page or <a href="#">see latest changes</a>!</div>
+        }
+        else
+        {
+            <div>Please enter a valid date!</div>
+        }
+    </div>
+</div>
 

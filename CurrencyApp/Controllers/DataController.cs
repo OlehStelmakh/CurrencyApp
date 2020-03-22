@@ -12,7 +12,7 @@ namespace CurrencyApp.Controllers
 {
     public class DataController : Controller
     {
-
+        [HttpGet]
         public IActionResult TakeData()
         {
             string requestMessage = "https://api.exchangeratesapi.io/latest";
@@ -35,6 +35,10 @@ namespace CurrencyApp.Controllers
                     currencies.Add(currency.Name);
                 }
             }
+
+            string baseCurrency = jsonObject["base"].ToString();
+            currencies.Add(baseCurrency);
+
             return currencies.ToArray();
         }
     }

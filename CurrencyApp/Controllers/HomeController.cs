@@ -22,8 +22,31 @@ namespace CurrencyApp.Controllers
             _logger = logger;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
+            Rates rates = new Rates();
+            return View(rates);
+        }
+
+        [HttpPost]
+        public IActionResult Index(List<string> inlineCheckbox, DateTime firstDate, DateTime lastDate, string baseCurrency)
+        {
+            if (firstDate.CompareTo(lastDate)>0)
+            {
+                DateTime temp = firstDate;
+                firstDate = lastDate;
+                lastDate = temp;
+                ViewBag.swapped = true;
+            }
+            RequestData.symbols = inlineCheckbox;
+            if(RequestData.symbols.Contains(baseCurrency))
+            {
+                RequestData.symbols.Remove(baseCurrency);
+            }
+            RequestData.startAt = "start_at=" + firstDate.ToString("yyyy-MM-dd") + "&";
+            RequestData.endAt = "end_at=" + lastDate.ToString("yyyy-MM-dd") + "&";
+            RequestData.baseCurrency = "base=" + baseCurrency + "&";
             string request = CreateRequest();
             string response = AdditionalMethods.createResponse(request);
             analyzeResponseData(response);
@@ -56,13 +79,13 @@ namespace CurrencyApp.Controllers
             stringBuilder.Append(RequestData.startAt);
             stringBuilder.Append(RequestData.endAt);
 
-            for (int i = 0; i<RequestData.symbols.Length; i++)
+            for (int i = 0; i<RequestData.symbols.Count; i++)
             {
                 if (i==0)
                 {
                     stringBuilder.Append("symbols=");
                 }
-                if (i==RequestData.symbols.Length - 1)
+                if (i==RequestData.symbols.Count - 1)
                 {
                     stringBuilder.Append(RequestData.symbols[i] + "&");
                     break;
