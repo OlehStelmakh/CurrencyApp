@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace CurrencyApp.Models
 {
-    public class NewsData
+    public class NewsData : IComparable
     {
         public string title { get; }
         public string author { get; }
@@ -24,11 +24,30 @@ namespace CurrencyApp.Models
             publishedAt = PublishedAt;
             id = Id;
         }
+
+        public int CompareTo(object obj)
+        {
+            NewsData other = obj as NewsData;
+            if (other != null)
+            {
+                int i = publishedAt.Value.CompareTo(other.publishedAt.Value);
+                if (i == -1)
+                    return 1;
+                else if (i == 1)
+                    return -1;
+                else
+                    return i;
+            }
+            else
+            {
+                throw new Exception("Impossible to compare two objects");
+            }
+        }
     }
 
     public static class News
     {
-        public static List<NewsData> allNewsData { get; set; } = new List<NewsData>();
+        public static SortedSet<NewsData> allNewsData { get; set; } = new SortedSet<NewsData>();
 
         public static int totalAmountOfResults { get; set; }
     }

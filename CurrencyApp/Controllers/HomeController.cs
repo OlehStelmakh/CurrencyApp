@@ -181,7 +181,6 @@ namespace CurrencyApp.Controllers
             {
                 foreach (var currency in key.Value)
                 {
-                    Console.WriteLine($"{currency.Key}  {currency.Value}");
                     if (!currencies.ContainsKey(currency.Key))
                     {
                         currencies.Add(currency.Key, new List<double>() { currency.Value });
