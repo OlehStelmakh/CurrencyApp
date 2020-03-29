@@ -32,27 +32,35 @@ namespace CurrencyApp.Controllers
         [HttpPost]
         public IActionResult Index(List<string> inlineCheckbox, DateTime firstDate, DateTime lastDate, string baseCurrency)
         {
-            if (firstDate.CompareTo(lastDate)>0)
-            {
-                DateTime temp = firstDate;
-                firstDate = lastDate;
-                lastDate = temp;
-                ViewBag.swapped = true;
-            }
-            RequestData.symbols = inlineCheckbox;
-            if(RequestData.symbols.Contains(baseCurrency))
-            {
-                RequestData.symbols.Remove(baseCurrency);
-            }
-            RequestData.startAt = "start_at=" + firstDate.ToString("yyyy-MM-dd") + "&";
-            RequestData.endAt = "end_at=" + lastDate.ToString("yyyy-MM-dd") + "&";
-            RequestData.baseCurrency = "base=" + baseCurrency + "&";
+            prepareRequestData(inlineCheckbox, firstDate, lastDate, baseCurrency, out bool swapped);
+            ViewBag.swapped = swapped;
             string request = CreateRequest();
             string response = AdditionalMethods.createResponse(request);
             analyzeResponseData(response);
             createDataLists(Rates.Data);
             Rates rates = new Rates();
             return View(rates);
+        }
+
+        public static void prepareRequestData(List<string> inlineCheckbox,
+            DateTime firstDate, DateTime lastDate, string baseCurrency, out bool swapped)
+        {
+            swapped = false;
+            if (firstDate.CompareTo(lastDate) > 0)
+            {
+                DateTime temp = firstDate;
+                firstDate = lastDate;
+                lastDate = temp;
+                swapped = true;
+            }
+            RequestData.symbols = inlineCheckbox;
+            if (RequestData.symbols.Contains(baseCurrency))
+            {
+                RequestData.symbols.Remove(baseCurrency);
+            }
+            RequestData.startAt = "start_at=" + firstDate.ToString("yyyy-MM-dd") + "&";
+            RequestData.endAt = "end_at=" + lastDate.ToString("yyyy-MM-dd") + "&";
+            RequestData.baseCurrency = "base=" + baseCurrency + "&";
         }
 
         public IActionResult Privacy()
