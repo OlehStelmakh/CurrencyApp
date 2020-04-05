@@ -1,10 +1,12 @@
-﻿@{
+﻿@model CurrencyApp.Models.IndexViewModel
+@using CurrencyApp.Shared
+@{
     ViewData["Title"] = "News";
 }
 
 <div class="container-fluid">
     <div class="container">
-       @foreach (var article in News.allNewsData)
+        @foreach (var article in Model.News)
         {
             <div class="row">
                 <div class="card mb-3">
@@ -26,7 +28,7 @@
                                 <p class="card-text">
                                     <small class="text-muted">
                                         Published at @article.publishedAt?.ToString("dd MMMM yyyy") by @article.author
-                                        
+
                                     </small>
                                 </p>
                             </div>
@@ -35,6 +37,15 @@
                     </div>
                 </div>
             </div>
-        } 
+        }
+    </div>
+     <div class="text-center mb-3">
+        <div class="btn-group">
+           @Html.PageLinks(Model.PageInfo, x => Url.Action("TakeNews", new { page = x }))
+           @using (Html.BeginForm("TakeNews", "News", FormMethod.Post))
+            {      
+             <button class="btn btn-primary">Update</button>
+            }
+        </div> 
     </div>
 </div>

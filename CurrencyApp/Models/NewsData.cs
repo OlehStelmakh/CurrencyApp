@@ -47,8 +47,10 @@ namespace CurrencyApp.Models
 
     public static class News
     {
-        public static SortedSet<NewsData> allNewsData { get; set; } = new SortedSet<NewsData>();
+        public static List<NewsData> allNewsData { get; set; } = new List<NewsData>();
 
         public static int totalAmountOfResults { get; set; }
+
+        public static bool NewsReceived { get; set; } = false;
     }
 }
