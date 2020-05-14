@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace CurrencyApp.Models
 {
-    public static class RequestData
+    public class RequestData
     {
         //default values
         public static string baseUrl { get; set; } = "https://api.exchangeratesapi.io/";
@@ -11,16 +11,15 @@ namespace CurrencyApp.Models
         public static string historyOrLatest { get; set; } = "history?";
 
         [Required]
-        public static string startAt { get; set; } = "start_at=2020-01-01&";
+        public string startAt { get; set; } = "2020-01-01";
 
         [Required]
-        public static string endAt { get; set; } = "end_at=" + DateTime.Now.ToString("yyyy-MM-dd") + "&";
+        public string endAt { get; set; } = DateTime.Now.ToString("yyyy-MM-dd");
 
-        [Required]
         public static List<string> symbols { get; set; } = new List<string> { "CAD", "HKD", "PHP", "DKK", "RUB", "USD" };
 
         [Required]
-        public static string baseCurrency { get; set; } = "base=USD&";
+        public string baseCurrency { get; set; } = "USD";
 
         public static string onlyOneDay { get; set; } = "";
     }

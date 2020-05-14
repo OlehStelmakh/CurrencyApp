@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
 namespace CurrencyApp.Models
 {
-    public static class CurrencyData
+    public class CurrencyData
     {
         public static DateTime startAt { set; get; }
         public static DateTime endAt { set; get; }

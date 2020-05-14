@@ -25,26 +25,27 @@ namespace CurrencyApp.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            Rates rates = new Rates();
+            Rates rates = Rates.GetInstance();
             return View(rates);
         }
 
         [HttpPost]
         public IActionResult Index(List<string> inlineCheckbox, DateTime firstDate, DateTime lastDate, string baseCurrency)
         {
-            prepareRequestData(inlineCheckbox, firstDate, lastDate, baseCurrency, out bool swapped);
+            RequestData data = prepareRequestData(inlineCheckbox, firstDate, lastDate, baseCurrency, out bool swapped);
             ViewBag.swapped = swapped;
-            string request = CreateRequest();
+            string request = CreateRequest(data);
             string response = AdditionalMethods.createResponse(request);
-            analyzeResponseData(response);
+            analyzeResponseData(response, data);
             createDataLists(Rates.Data);
-            Rates rates = new Rates();
+            Rates rates = Rates.GetInstance();
             return View(rates);
         }
 
-        public static void prepareRequestData(List<string> inlineCheckbox,
+        public static RequestData prepareRequestData(List<string> inlineCheckbox,
             DateTime firstDate, DateTime lastDate, string baseCurrency, out bool swapped)
         {
+            RequestData requestData = new RequestData();
             swapped = false;
             if (firstDate.CompareTo(lastDate) > 0)
             {
@@ -58,9 +59,10 @@ namespace CurrencyApp.Controllers
             {
                 RequestData.symbols.Remove(baseCurrency);
             }
-            RequestData.startAt = "start_at=" + firstDate.ToString("yyyy-MM-dd") + "&";
-            RequestData.endAt = "end_at=" + lastDate.ToString("yyyy-MM-dd") + "&";
-            RequestData.baseCurrency = "base=" + baseCurrency + "&";
+            requestData.startAt = "start_at=" + firstDate.ToString("yyyy-MM-dd") + "&";
+            requestData.endAt = "end_at=" + lastDate.ToString("yyyy-MM-dd") + "&";
+            requestData.baseCurrency = "base=" + baseCurrency + "&";
+            return requestData;
         }
 
         public IActionResult Privacy()
@@ -74,7 +76,7 @@ namespace CurrencyApp.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        public static string CreateRequest()
+        public static string CreateRequest(RequestData requestData)
         {
             StringBuilder stringBuilder = new StringBuilder(150);
             stringBuilder.Append(RequestData.baseUrl);
@@ -84,8 +86,8 @@ namespace CurrencyApp.Controllers
                 return stringBuilder.ToString();
             }
             stringBuilder.Append(RequestData.historyOrLatest);
-            stringBuilder.Append(RequestData.startAt);
-            stringBuilder.Append(RequestData.endAt);
+            stringBuilder.Append(requestData.startAt);
+            stringBuilder.Append(requestData.endAt);
 
             for (int i = 0; i<RequestData.symbols.Count; i++)
             {
@@ -100,25 +102,25 @@ namespace CurrencyApp.Controllers
                 }
                 stringBuilder.Append(RequestData.symbols[i] + ",");
             }
-            stringBuilder.Append(RequestData.baseCurrency);
+            stringBuilder.Append(requestData.baseCurrency);
             return stringBuilder.ToString();
         }
 
-        public static void analyzeResponseData(string jsonData)
-        {
+        public static void analyzeResponseData(string jsonData, RequestData requestData)
+        { 
             Rates.Data = new SortedDictionary<DateTime, Dictionary<string, double>>();
             
             var jsonObject = JObject.Parse(jsonData);
 
-            if (!string.IsNullOrEmpty(RequestData.startAt))
+            if (!string.IsNullOrEmpty(requestData.startAt))
             {
                 CurrencyData.startAt = getDateFromString(jsonObject["start_at"].ToString());
             }
-            if (!string.IsNullOrEmpty(RequestData.endAt))
+            if (!string.IsNullOrEmpty(requestData.endAt))
             {
                 CurrencyData.endAt = getDateFromString(jsonObject["end_at"].ToString());
             }
-            if (!string.IsNullOrEmpty(RequestData.baseCurrency))
+            if (!string.IsNullOrEmpty(requestData.baseCurrency))
             {
                 CurrencyData.baseCurrency = jsonObject["base"].ToString();
             }
